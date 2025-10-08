@@ -6,33 +6,29 @@ from xml.etree import ElementTree
 from loguru import logger
 
 
-class BEAST2(Engine):
+class BEASTX(Engine):
     def can_run_analysis(self, analysis_file: Path) -> bool:
-        """Checks if BEAST 2 can run the analysis in the given file."""
+        """Checks if BEAST X can run the analysis in the given file."""
         try:
             xml = ElementTree.parse(analysis_file)
         except ElementTree.ParseError:
-            logger.debug("No BEAST 2 file: no XML file.")
+            logger.debug("No BEAST X file: no XML file.")
             return False
 
         root = xml.getroot()
 
         if root is None or root.tag.lower() != "beast":
-            logger.debug("No BEAST 2 file: no root BEAST tag.")
+            logger.debug("No BEAST X file: no root BEAST tag.")
             return False
 
-        if not root.attrib.get("version", "").startswith("2."):
-            logger.debug("No BEAST 2 file: wrong version (likely for BEAST X).")
+        if not root.attrib.get("version", "").startswith("1.") and not root.attrib.get(
+            "version", ""
+        ).startswith("10."):
+            logger.debug("No BEAST X file: wrong version (likely for BEAST 2).")
             return False
 
-        if not any(child.tag.lower() == "data" for child in root) and not any(
-            child.tag.lower() == "alignment" for child in root
-        ):
-            logger.debug("No BEAST 2 file: no <data> tag.")
-            return False
-
-        if not any(child.tag.lower() == "run" for child in root):
-            logger.debug("No BEAST 2 file: no <run> tag.")
+        if not any(child.tag.lower() == "mcmc" for child in root):
+            logger.debug("No BEAST2 file: no <mcmc> tag.")
             return False
 
         logger.debug("BEAST 2 file found.")
