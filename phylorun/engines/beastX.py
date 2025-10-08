@@ -28,10 +28,10 @@ class BEASTX(Engine):
             return False
 
         if not any(child.tag.lower() == "mcmc" for child in root):
-            logger.debug("No BEAST2 file: no <mcmc> tag.")
+            logger.debug("No BEASTX file: no <mcmc> tag.")
             return False
 
-        logger.debug("BEAST 2 file found.")
+        logger.debug("BEAST X file found.")
 
         return True
 
