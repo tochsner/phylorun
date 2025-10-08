@@ -62,9 +62,9 @@ def cli(
         if selected_engine is None:
             raise click.ClickException(f"Engine '{engine}' is not available.")
     else:
-        for engine in ENGINES:
-            if engine.can_run_analysis(analysis_file):
-                selected_engine = engine
+        for potentialEngine in ENGINES:
+            if potentialEngine.can_run_analysis(analysis_file):
+                selected_engine = potentialEngine
                 break
 
         if selected_engine is None:

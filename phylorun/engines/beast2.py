@@ -51,7 +51,7 @@ class BEAST2(Engine):
         analysis_file: Path,
         engine_path: Optional[str] = None,
         additional_cli_args: Optional[list[str]] = None,
-    ) -> bool:
+    ):
         """Runs the analysis in the given file using the locally installed engine."""
         engine_path = engine_path or self._find_binary_path()
         if not engine_path:
@@ -77,7 +77,7 @@ class BEAST2(Engine):
 
     def run_containerized_analysis(
         self, analysis_file: Path, additional_cli_args: Optional[list[str]] = None
-    ) -> bool:
+    ):
         """Runs the analysis in the given file in a container. This does not require the
         engine to be installed on the system."""
         logger.info("Run container BEAST 2")
