@@ -1,3 +1,6 @@
+test:
+  uv run pytest tests
+
 check:
   uv run ruff check --fix phylorun
   uv run pyright phylorun
