@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Optional
 
-from docker.errors import DockerException
 from phylorun.engines.engine import Engine
 from xml.etree import ElementTree
 
@@ -10,10 +9,9 @@ import subprocess
 
 import os
 
-import docker
-
 from phylorun.utils.docker_utils import (
     create_image_if_needed,
+    get_docker_client,
     run_and_print_command,
     start_container,
 )
@@ -90,15 +88,7 @@ class BEAST2(Engine):
     ):
         """Runs the analysis in the given file in a container. This does not require the
         engine to be installed on the system."""
-        try:
-            docker_client = docker.from_env()
-        except DockerException:
-            logger.error(
-                "Docker could not be instantiated. Is it installed and running?"
-            )
-            raise Exception(
-                "Docker could not be instantiated. Is it installed and running?"
-            )
+        docker_client = get_docker_client()
 
         IMAGE_NAME = "beast2:2.7.7"
 

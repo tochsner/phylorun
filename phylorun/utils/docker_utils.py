@@ -2,7 +2,18 @@ import io
 import sys
 import docker
 from docker.models.containers import Container
-from docker.errors import ImageNotFound
+from docker.errors import DockerException, ImageNotFound
+from loguru import logger
+
+
+def get_docker_client() -> docker.DockerClient:
+    try:
+        return docker.from_env()
+    except DockerException:
+        logger.error("Docker could not be instantiated. Is it installed and running?")
+        raise Exception(
+            "Docker could not be instantiated. Is it installed and running?"
+        )
 
 
 def create_image_if_needed(
