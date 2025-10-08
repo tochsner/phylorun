@@ -2,6 +2,7 @@ import io
 import sys
 import docker
 from docker.models.containers import Container
+from docker.errors import ImageNotFound
 
 
 def create_image_if_needed(
@@ -11,7 +12,7 @@ def create_image_if_needed(
         client.images.get(image_name)
         # image already created
         return
-    except docker.errors.ImageNotFound:
+    except ImageNotFound:
         # we still need to create the image
         ...
 
