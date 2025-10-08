@@ -1,4 +1,5 @@
 from pathlib import Path
+import subprocess
 from typing import Optional
 
 from loguru import logger
@@ -26,8 +27,13 @@ class RevBayes(Engine):
         additional_cli_args: Optional[list[str]] = None,
     ):
         """Runs the analysis in the given file using the locally installed engine."""
-        logger.info("Run local RevBayes")
-        raise NotImplementedError
+        engine_path = engine_path or "rb"
+        if not engine_path:
+            raise Exception("No RevBayes binary found.")
+
+        additional_cli_args = additional_cli_args or []
+
+        subprocess.run([engine_path, *additional_cli_args, analysis_file])
 
     def run_containerized_analysis(
         self, analysis_file: Path, additional_cli_args: Optional[list[str]] = None
