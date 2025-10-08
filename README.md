@@ -78,5 +78,5 @@ phylorun validate model.phylospec
 All unknown arguments are directly passed to the engine:
 
 ```bash
-phylorun --resume someBeast2Model.xml
+phylorun someBeast2Model.xml -resume
 ```
