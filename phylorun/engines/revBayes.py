@@ -6,6 +6,10 @@ from phylorun.engines.engine import Engine
 
 
 class RevBayes(Engine):
+    def name(self) -> str:
+        """Returns the name of the engine as used in the CLI."""
+        return "revbayes"
+
     def can_run_analysis(self, analysis_file: Path) -> bool:
         """Checks if RevBayes can run the analysis in the given file."""
         if not analysis_file.name.endswith(".rev"):
@@ -22,6 +26,7 @@ class RevBayes(Engine):
         additional_cli_args: Optional[list[str]] = None,
     ) -> bool:
         """Runs the analysis in the given file using the locally installed engine."""
+        logger.info("Run local RevBayes")
         raise NotImplementedError
 
     def run_containerized_analysis(
@@ -29,4 +34,5 @@ class RevBayes(Engine):
     ) -> bool:
         """Runs the analysis in the given file in a container. This does not require the
         engine to be installed on the system."""
+        logger.info("Run container RevBayes")
         raise NotImplementedError

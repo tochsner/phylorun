@@ -9,6 +9,11 @@ class Engine(ABC):
     using the engine."""
 
     @abstractmethod
+    def name(self) -> str:
+        """Returns the name of the engine as used in the CLI."""
+        raise NotImplementedError
+
+    @abstractmethod
     def can_run_analysis(self, analysis_file: Path) -> bool:
         """Checks if this engine can run the analysis in the given file."""
         raise NotImplementedError

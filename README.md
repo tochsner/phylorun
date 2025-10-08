@@ -20,14 +20,21 @@ phylorun someBeast2Model.xml
 phylorun someRevModel.rev
 ```
 
-`phylorun` automatically detects which MCMC engine to use.
+`phylorun` automatically detects which MCMC engine to use. However, you can always specify the engine manually:
+
+```bash
+phylorun --engine beastx someBeastXModel.xml
+phylorun --engine beast2 someBeast2Model.xml
+phylorun --engine revbayes someRevModel.rev
+```
+
 
 By default, `phylorun` tries to use your existing installation of the engine. Alternatively, you can specify the location of the binary on your system:
 
 ```bash
-phylorun --engine "/Applications/BEAST X 10.5.0/bin/beast" someBeastXModel.xml
-phylorun --engine "/Applications/BEAST 2.7.7/bin/beast" someBeast2Model.xml
-phylorun --engine "/usr/bin/rev" someRevModel.rev
+phylorun --bin "/Applications/BEAST X 10.5.0/bin/beast" someBeastXModel.xml
+phylorun --bin "/Applications/BEAST 2.7.7/bin/beast" someBeast2Model.xml
+phylorun --bin "/usr/bin/rev" someRevModel.rev
 ```
 
 If you don't have an engine installed on your local system, you can use the `--container` flag and `phylorun` automatically installs everything that's needed in an isolated environment:
@@ -45,9 +52,9 @@ Currently, this does not work when your BEAST 2 analysis uses packages.
 `phylorun` can run a PhyloSpec analysis using any of the engines:
 
 ```bash
-phylorun beastx model.phylospec
-phylorun beast2 model.phylospec
-phylorun revbayes model.phylospec
+phylorun --beastx model.phylospec
+phylorun --beast2 model.phylospec
+phylorun --revbayes model.phylospec
 ```
 
 ### Benchmark engines
