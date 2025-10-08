@@ -1,4 +1,6 @@
+import os
 from pathlib import Path
+import subprocess
 from typing import Optional
 from phylorun.engines.engine import Engine
 from xml.etree import ElementTree
@@ -46,8 +48,29 @@ class BEASTX(Engine):
         additional_cli_args: Optional[list[str]] = None,
     ) -> bool:
         """Runs the analysis in the given file using the locally installed engine."""
-        logger.info("Run local BEAST X")
-        raise NotImplementedError
+        engine_path = engine_path or self._find_binary_path()
+        if not engine_path:
+            raise Exception("No BEAST X binary found.")
+
+        additional_cli_args = additional_cli_args or []
+
+        subprocess.run([engine_path, *additional_cli_args, analysis_file])
+
+    def _find_binary_path(self) -> Optional[str]:
+        if path := os.environ.get("BEAST"):
+            return path
+
+        possible_paths = (
+            list(Path("/Applications").glob("BEAST X*/bin/beast"))
+            + list(Path("/Applications").glob("BEAST X*/bin/beast"))
+            + list(Path("~").glob("beast*/bin/beast"))
+        )
+        possible_paths = sorted(possible_paths)
+
+        if not possible_paths:
+            return None
+
+        return str(possible_paths[-1])
 
     def run_containerized_analysis(
         self, analysis_file: Path, additional_cli_args: Optional[list[str]] = None
