@@ -20,16 +20,9 @@ phylorun someBeast2Model.xml
 phylorun someRevModel.rev
 ```
 
-`phylorun` automatically detects which MCMC engine to use. However, you can always specify the engine manually:
+`phylorun` automatically detects which MCMC engine to use.
 
-```bash
-phylorun --engine beastx someBeastXModel.xml
-phylorun --engine beast2 someBeast2Model.xml
-phylorun --engine revbayes someRevModel.rev
-```
-
-
-By default, `phylorun` tries to use your existing installation of the engine. Alternatively, you can specify the location of the binary on your system:
+By default, `phylorun` tries to use your existing installation of the engine. If this fails, you can specify the location of the binary on your system:
 
 ```bash
 phylorun --bin "/Applications/BEAST X 10.5.0/bin/beast" someBeastXModel.xml
