@@ -69,19 +69,16 @@ class RevBayes(Engine):
             docker_client,
             IMAGE_NAME,
             volumes={
-                str(analysis_file.parent.resolve()): {"bind": "/data", "mode": "rw"}
+                str(analysis_file.parent.resolve()): {"bind": "/data", "mode": "rw"},
             },
         )
 
         try:
             run_and_print_command(
                 container,
-                "ls /opt",
+                f"/opt/revbayes-v1.3.1/bin/rb {' '.join(additional_cli_args or [])} '/data/{analysis_file.name}'",
+                working_dir="/data",
             )
-            # run_and_print_command(
-            #     container,
-            #     f"/opt/beast/bin/beast {' '.join(additional_cli_args or [])} -working '/data/{analysis_file.name}'",
-            # )
         finally:
             container.stop()
             container.remove()

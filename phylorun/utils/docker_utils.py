@@ -28,6 +28,10 @@ def create_image_if_needed(
         # we still need to create the image
         ...
 
+    logger.info(
+        "Setting up docker container. This might take a while, but only has to be done once."
+    )
+
     docker_file_bytes = io.BytesIO(docker_file.encode("utf-8"))
 
     client.images.build(
@@ -47,9 +51,14 @@ def start_container(
 
 
 def run_and_print_command(
-    container: Container, command: str, user: Optional[str] = None
+    container: Container,
+    command: str,
+    user: Optional[str] = None,
+    working_dir: Optional[str] = None,
 ):
-    result = container.exec_run(command, stream=True, demux=True, user=user)
+    result = container.exec_run(
+        command, stream=True, demux=True, user=user, workdir=working_dir
+    )
 
     for stdout, stderr in result.output:
         if stdout:
