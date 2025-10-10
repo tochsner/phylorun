@@ -13,6 +13,6 @@ build:
   uv build
 
 publish:
-  just build
   uv version --bump minor
+  just build
   source .env && uv publish --token $UV_PUBLISH_PASSWORD
