@@ -107,20 +107,31 @@ Use `phylorun --bin <path-to-binary> your_analysis.xml` to manually specify the 
             """,
         )
 
+        working_dir_is_data_dir = Path() == analysis_file.parent
+
+        volumes = {str(analysis_file.parent.resolve()): {"bind": "/data", "mode": "rw"}}
+        if not working_dir_is_data_dir:
+            volumes[str(Path().resolve())] = {"bind": "/working", "mode": "rw"}
+
         container = start_container(
             docker_client,
             IMAGE_NAME,
-            volumes={
-                str(analysis_file.parent.resolve()): {"bind": "/data", "mode": "rw"},
-                str(Path().resolve()): {"bind": "/working_dir", "mode": "rw"},
-            },
+            volumes=volumes,
         )
 
         try:
-            run_and_print_command(
-                container,
-                f"/opt/BEASTv10.5.0/bin/beast -java -working {' '.join(additional_cli_args or [])} '/data/{analysis_file.name}'",
-            )
+            if working_dir_is_data_dir:
+                run_and_print_command(
+                    container,
+                    f"/opt/BEASTv10.5.0/bin/beast -java {' '.join(additional_cli_args or [])} '/data/{analysis_file.name}'",
+                    working_dir="/data",
+                )
+            else:
+                run_and_print_command(
+                    container,
+                    f"/opt/BEASTv10.5.0/bin/beast -java {' '.join(additional_cli_args or [])} '/data/{analysis_file.name}'",
+                    working_dir="/working",
+                )
         finally:
             container.stop()
             container.remove()
