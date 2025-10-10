@@ -1,5 +1,6 @@
 import io
 import sys
+from typing import Optional
 import docker
 from docker.models.containers import Container
 from docker.errors import DockerException, ImageNotFound
@@ -45,8 +46,10 @@ def start_container(
     )
 
 
-def run_and_print_command(container: Container, command: str):
-    result = container.exec_run(command, stream=True, demux=True)
+def run_and_print_command(
+    container: Container, command: str, user: Optional[str] = None
+):
+    result = container.exec_run(command, stream=True, demux=True, user=user)
 
     for stdout, stderr in result.output:
         if stdout:

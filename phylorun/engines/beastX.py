@@ -7,6 +7,17 @@ from xml.etree import ElementTree
 
 from loguru import logger
 
+from phylorun.utils.docker_utils import (
+    create_image_if_needed,
+    get_docker_client,
+    run_and_print_command,
+    start_container,
+)
+
+
+BINARY_URL = "https://github.com/beast-dev/beast-mcmc/releases/download/v10.5.0/BEAST_X_v10.5.0.tgz"
+EB_URL = "https://raw.githubusercontent.com/easybuilders/easybuild-easyconfigs/refs/heads/main/easybuild/easyconfigs/b/beagle-lib/beagle-lib-4.0.1-GCC-12.3.0.eb"
+
 
 class BEASTX(Engine):
     def name(self) -> str:
@@ -77,5 +88,36 @@ class BEASTX(Engine):
     ):
         """Runs the analysis in the given file in a container. This does not require the
         engine to be installed on the system."""
-        logger.info("Run container BEAST X")
-        raise NotImplementedError
+        docker_client = get_docker_client()
+
+        IMAGE_NAME = "beastx:10.5.0"
+
+        create_image_if_needed(
+            docker_client,
+            IMAGE_NAME,
+            f"""FROM ubuntu:latest
+            RUN apt-get update \\
+                && apt-get install -y wget tar openjdk-17-jdk python3-venv python3-pip \\
+                && wget {BINARY_URL} -O /BEAST.tgz \\
+                && tar -xzf /BEAST.tgz -C /opt   \\
+                && rm /BEAST.tgz
+            """,
+        )
+
+        container = start_container(
+            docker_client,
+            IMAGE_NAME,
+            volumes={
+                str(analysis_file.parent.resolve()): {"bind": "/data", "mode": "rw"},
+                str(Path().resolve()): {"bind": "/working_dir", "mode": "rw"},
+            },
+        )
+
+        try:
+            run_and_print_command(
+                container,
+                f"/opt/BEASTv10.5.0/bin/beast -java -working {' '.join(additional_cli_args or [])} '/data/{analysis_file.name}'",
+            )
+        finally:
+            container.stop()
+            container.remove()

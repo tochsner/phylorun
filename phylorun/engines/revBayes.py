@@ -4,6 +4,15 @@ from typing import Optional
 
 from loguru import logger
 from phylorun.engines.engine import Engine
+from phylorun.utils.docker_utils import (
+    create_image_if_needed,
+    get_docker_client,
+    run_and_print_command,
+    start_container,
+)
+
+
+BINARY_URL = "https://github.com/revbayes/revbayes/releases/download/v1.3.1/revbayes-v1.3.1-linux64.tar.gz"
 
 
 class RevBayes(Engine):
@@ -40,5 +49,39 @@ class RevBayes(Engine):
     ):
         """Runs the analysis in the given file in a container. This does not require the
         engine to be installed on the system."""
-        logger.info("Run container RevBayes")
-        raise NotImplementedError
+        docker_client = get_docker_client()
+
+        IMAGE_NAME = "revbayes:1.3.1"
+
+        create_image_if_needed(
+            docker_client,
+            IMAGE_NAME,
+            f"""FROM ubuntu:latest
+            RUN apt-get update \\
+                && apt-get install -y wget tar \\
+                && wget {BINARY_URL} -O /revBayes.tgz \\
+                && tar -xzf /revBayes.tgz -C /opt   \\
+                && rm /revBayes.tgz
+            """,
+        )
+
+        container = start_container(
+            docker_client,
+            IMAGE_NAME,
+            volumes={
+                str(analysis_file.parent.resolve()): {"bind": "/data", "mode": "rw"}
+            },
+        )
+
+        try:
+            run_and_print_command(
+                container,
+                "ls /opt",
+            )
+            # run_and_print_command(
+            #     container,
+            #     f"/opt/beast/bin/beast {' '.join(additional_cli_args or [])} -working '/data/{analysis_file.name}'",
+            # )
+        finally:
+            container.stop()
+            container.remove()

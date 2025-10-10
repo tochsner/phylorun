@@ -16,6 +16,8 @@ from phylorun.utils.docker_utils import (
     start_container,
 )
 
+BINARY_URL = "https://github.com/CompEvol/beast2/releases/download/v2.7.7/BEAST.v2.7.7.Linux.x86.tgz"
+
 
 class BEAST2(Engine):
     def name(self) -> str:
@@ -95,12 +97,12 @@ class BEAST2(Engine):
         create_image_if_needed(
             docker_client,
             IMAGE_NAME,
-            """FROM ubuntu:latest
+            f"""FROM ubuntu:latest
             RUN apt-get update \\
                 && apt-get install -y wget tar \\
-                && wget https://github.com/CompEvol/beast2/releases/download/v2.7.7/BEAST.v2.7.7.Linux.x86.tgz -O /BEAST.tgz \\
+                && wget {BINARY_URL} -O /BEAST.tgz \\
                 && tar -xzf /BEAST.tgz -C /opt   \\
-                && rm /BEAST.tgz
+                && rm /BEAST.tgz \\
             """,
         )
 

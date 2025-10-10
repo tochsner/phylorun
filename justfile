@@ -11,3 +11,7 @@ format:
 build:
   rm -rf dist
   uv build
+
+publish:
+  uv version --bump minor
+  source .env && uv publish --token $UV_PUBLISH_PASSWORD
