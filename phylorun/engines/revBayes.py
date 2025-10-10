@@ -38,7 +38,10 @@ class RevBayes(Engine):
         """Runs the analysis in the given file using the locally installed engine."""
         engine_path = engine_path or "rb"
         if not engine_path:
-            raise Exception("No RevBayes binary found.")
+            raise Exception("""No RevBayes binary found.
+Use `phylorun --container your_analysis.rev` to use a docker container if you don't have RevBayes installed.
+Use `phylorun --bin <path-to-binary> your_analysis.rev` to manually specify the RevBayes binary.
+            """)
 
         additional_cli_args = additional_cli_args or []
 

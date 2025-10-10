@@ -61,7 +61,10 @@ class BEASTX(Engine):
         """Runs the analysis in the given file using the locally installed engine."""
         engine_path = engine_path or self._find_binary_path()
         if not engine_path:
-            raise Exception("No BEAST X binary found.")
+            raise Exception("""No BEAST X binary found.
+Use `phylorun --container your_analysis.xml` to use a docker container if you don't have BEAST X installed.
+Use `phylorun --bin <path-to-binary> your_analysis.xml` to manually specify the BEAST X binary.
+            """)
 
         additional_cli_args = additional_cli_args or []
 

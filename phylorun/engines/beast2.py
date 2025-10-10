@@ -63,9 +63,13 @@ class BEAST2(Engine):
         additional_cli_args: Optional[list[str]] = None,
     ):
         """Runs the analysis in the given file using the locally installed engine."""
-        engine_path = engine_path or self._find_binary_path()
         if not engine_path:
-            raise Exception("No BEAST 2 binary found.")
+            engine_path = engine_path or self._find_binary_path()
+            raise Exception("""No BEAST 2 binary found.
+Use `phylorun --container your_analysis.xml` to use a docker container if you don't have BEAST 2 installed.
+Use `phylorun --bin <path-to-binary> your_analysis.xml` to manually specify the BEAST 2 binary.
+            """)
+            ...
 
         additional_cli_args = additional_cli_args or []
 
