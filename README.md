@@ -68,7 +68,7 @@ phylorun validate model.phylospec
 
 ### Configuration
 
-All unknown arguments are directly passed to the engine:
+All unknown arguments are directly passed to the engine (put them at the end of the command):
 
 ```bash
 phylorun someBeast2Model.xml -resume
