@@ -173,7 +173,7 @@ wheels = [
 
 [[package]]
 name = "phylorun"
-version = "0.5.0"
+version = "0.4.0"
 source = { virtual = "." }
 dependencies = [
     { name = "click" },

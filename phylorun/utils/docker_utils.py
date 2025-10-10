@@ -77,7 +77,7 @@ def run_and_print_command(
         working_dir (Optional[str]): The working directory inside the container (if specified).
     """
     result = container.exec_run(
-        command, stream=True, demux=True, user=user, workdir=working_dir
+        command, stream=True, demux=True, user=user or "root", workdir=working_dir
     )
 
     for stdout, stderr in result.output:
