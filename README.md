@@ -1,6 +1,6 @@
 # 🧬 PhyloRun
 
-PhyloRun allows you to run BEAST X, BEAST 2, and RevBayes using a single tool.
+PhyloRun allows you to run BEAST X, BEAST 2, RevBayes, and LPhy experiments using a single tool.
 
 ## 📦 Installation
 
@@ -12,12 +12,13 @@ pip install --upgrade phylorun
 
 ## 🚀 Features
 
-### Run BEAST X, BEAST 2 and RevBayes analyses
+### Run BEAST X, BEAST 2, RevBayes and LPhy analyses
 
 ```bash
 phylorun someBeastXModel.xml
 phylorun someBeast2Model.xml
 phylorun someRevModel.rev
+phylorun someRevModel.lphy
 ```
 
 `phylorun` automatically detects which MCMC engine to use.
@@ -72,4 +73,10 @@ All unknown arguments are directly passed to the engine (put them at the end of 
 
 ```bash
 phylorun someBeast2Model.xml -resume
+```
+
+For LPhy, arguments prefixed with `--beast2` will be passed to BEAST 2 and not to LPhyBeast:
+
+```bash
+phylorun someLphyModel.lphy --beast2-resume
 ```
