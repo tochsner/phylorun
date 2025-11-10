@@ -9,6 +9,9 @@ import subprocess
 
 import os
 
+import phylorun
+from phylorun.utils.phylospec_utils import is_phylospec_file
+
 
 class LPhy(Engine):
     def name(self) -> str:
@@ -17,6 +20,9 @@ class LPhy(Engine):
 
     def can_run_analysis(self, analysis_file: Path) -> bool:
         """Checks if LPhy engine can run the analysis in the given file."""
+        if is_phylospec_file(analysis_file):
+            return True
+
         if not analysis_file.name.endswith(".lphy"):
             logger.debug("No LPhy file: wrong file extension (.lphy requried).")
             return False
@@ -36,6 +42,9 @@ class LPhy(Engine):
             raise Exception("""No lphybeast binary found.
 Use `phylorun --bin <path-to-binary> your_analysis.xml` to manually specify the lphybeast binary.
             """)
+
+        if is_phylospec_file(analysis_file):
+            analysis_file = self._convert_to_lphy(analysis_file)
 
         additional_lphy_cli_args = [
             arg for arg in additional_cli_args or [] if not arg.startswith("--beast2")
@@ -89,6 +98,36 @@ Use `phylorun --bin <path-to-binary> your_analysis.xml` to manually specify the 
             return None
 
         return str(possible_paths[-1])
+
+    def _convert_to_lphy(self, phylospec_file: Path) -> Path:
+        """Converts the PhyloSpec file into an LPhy file and returns the created LPhy
+        file path."""
+        convert_to_lphy_jar = Path(phylorun.__path__[0]) / "jars" / "convertToLPhy.jar"
+
+        lphy_result = subprocess.run(
+            [
+                "java",
+                "-cp",
+                convert_to_lphy_jar,
+                "org.phylospec.converters.ConvertToLPhy",
+                phylospec_file,
+            ],
+            capture_output=True,
+        )
+        if lphy_result.stderr:
+            logger.error(lphy_result.stderr.decode())
+            raise Exception("PhyloSpec script is invalid.")
+
+        lphy_content = lphy_result.stdout
+        if not lphy_content:
+            raise Exception(
+                "Unknonw error when converting the .phylospec script to an .lphy script."
+            )
+
+        lphy_file = phylospec_file.parent / (phylospec_file.stem + "_converted.lphy")
+        lphy_file.write_bytes(lphy_result.stdout)
+
+        return lphy_file
 
     def run_containerized_analysis(
         self, analysis_file: Path, additional_cli_args: Optional[list[str]] = None

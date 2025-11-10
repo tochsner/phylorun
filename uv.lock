@@ -173,8 +173,8 @@ wheels = [
 
 [[package]]
 name = "phylorun"
-version = "0.6.0"
-source = { virtual = "." }
+version = "0.8.0"
+source = { editable = "." }
 dependencies = [
     { name = "click" },
     { name = "docker" },

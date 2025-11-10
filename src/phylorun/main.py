@@ -13,9 +13,9 @@ CONTEXT_SETTINGS = dict(ignore_unknown_options=True, allow_extra_args=True)
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option(
     "--engine",
-    type=click.Choice(["beastx", "beast2", "revbayes"], case_sensitive=False),
+    type=click.Choice(["beastx", "beast2", "revbayes", "lphy"], case_sensitive=False),
     required=False,
-    help="Select engine explicitly: beastx | beast2 | revbayes.",
+    help="Select engine explicitly: beastx | beast2 | revbayes | lphy.",
 )
 @click.option(
     "--bin",
@@ -55,9 +55,16 @@ def cli(
 
     if engine:
         for e in ENGINES:
-            if e.name() == engine:
-                selected_engine = e
-                break
+            if e.name() != engine:
+                continue
+
+            if not e.can_run_analysis(analysis_file):
+                raise click.ClickException(
+                    f"Engine '{engine}' cannot run file '{analysis_file}'."
+                )
+
+            selected_engine = e
+            break
 
         if selected_engine is None:
             raise click.ClickException(f"Engine '{engine}' is not available.")
