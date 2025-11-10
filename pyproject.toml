@@ -15,3 +15,6 @@ dependencies = [
 
 [project.scripts]
 phylorun = "phylorun.main:cli"
+
+[tool.uv.build-backend]
+source-include = ["phylorun/jars/**"]
