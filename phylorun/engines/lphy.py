@@ -38,11 +38,11 @@ Use `phylorun --bin <path-to-binary> your_analysis.xml` to manually specify the 
             """)
 
         additional_lphy_cli_args = [
-            arg for arg in additional_cli_args if not arg.startswith("--beast2")
+            arg for arg in additional_cli_args or [] if not arg.startswith("--beast2")
         ]
         additional_beast_cli_args = [
             arg.removeprefix("--beast2")
-            for arg in additional_cli_args
+            for arg in additional_cli_args or []
             if arg.startswith("--beast2")
         ] or ["-working"]
 
