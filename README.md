@@ -46,6 +46,7 @@ Currently, this does not work when your BEAST 2 analysis uses packages.
 `phylorun` can run a PhyloSpec analysis using any of the engines:
 
 ```bash
+phylorun --engine rev model.phylospec
 phylorun --engine lphy model.phylospec
 ```
 
