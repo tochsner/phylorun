@@ -3,6 +3,7 @@ import subprocess
 from typing import Optional
 
 from loguru import logger
+import phylorun
 from phylorun.engines.engine import Engine
 from phylorun.utils.docker_utils import (
     create_image_if_needed,
@@ -10,6 +11,7 @@ from phylorun.utils.docker_utils import (
     run_and_print_command,
     start_container,
 )
+from phylorun.utils.phylospec_utils import is_phylospec_file
 
 
 BINARY_URL = "https://github.com/revbayes/revbayes/releases/download/v1.3.1/revbayes-v1.3.1-linux64.tar.gz"
@@ -22,6 +24,9 @@ class RevBayes(Engine):
 
     def can_run_analysis(self, analysis_file: Path) -> bool:
         """Checks if RevBayes can run the analysis in the given file."""
+        if is_phylospec_file(analysis_file):
+            return True
+
         if not analysis_file.name.endswith(".rev"):
             logger.debug("No Rev file: wrong file extension (.rev requried).")
             return False
@@ -45,6 +50,9 @@ Use `phylorun --bin <path-to-binary> your_analysis.rev` to manually specify the 
 
         additional_cli_args = additional_cli_args or []
 
+        if is_phylospec_file(analysis_file):
+            analysis_file = self._convert_to_rev(analysis_file)
+
         subprocess.run([engine_path, *additional_cli_args, analysis_file])
 
     def run_containerized_analysis(
@@ -52,6 +60,9 @@ Use `phylorun --bin <path-to-binary> your_analysis.rev` to manually specify the 
     ):
         """Runs the analysis in the given file in a container. This does not require the
         engine to be installed on the system."""
+        if is_phylospec_file(analysis_file):
+            analysis_file = self._convert_to_rev(analysis_file)
+
         docker_client = get_docker_client()
 
         IMAGE_NAME = "revbayes:1.3.1"
@@ -96,3 +107,33 @@ Use `phylorun --bin <path-to-binary> your_analysis.rev` to manually specify the 
         finally:
             container.stop()
             container.remove()
+
+    def _convert_to_rev(self, phylospec_file: Path) -> Path:
+        """Converts the PhyloSpec file into an RevBayes file and returns the created RevBayes
+        file path."""
+        convert_to_rev_jar = Path(phylorun.__path__[0]) / "jars" / "convertToRev.jar"
+
+        rev_result = subprocess.run(
+            [
+                "java",
+                "-cp",
+                convert_to_rev_jar,
+                "org.phylospec.converters.ConvertToRev",
+                phylospec_file,
+            ],
+            capture_output=True,
+        )
+        if rev_result.stderr:
+            logger.error(rev_result.stderr.decode())
+            raise Exception("PhyloSpec script is invalid.")
+
+        rev_content = rev_result.stdout
+        if not rev_content:
+            raise Exception(
+                "Unknonw error when converting the .phylospec script to an .rev script."
+            )
+
+        rev_file = phylospec_file.parent / (phylospec_file.stem + "_converted.rev")
+        rev_file.write_bytes(rev_result.stdout)
+
+        return rev_file
